@@ -22,7 +22,6 @@ public class CampusFrontendUI extends JFrame {
 
         setJMenuBar(createMenuBar());
 
-        add(createSidebar(), BorderLayout.WEST);
         add(createMainPanel(), BorderLayout.CENTER);
     }
 
@@ -59,36 +58,8 @@ public class CampusFrontendUI extends JFrame {
         }
     }
 
-    private JPanel createSidebar() {
-        JPanel side = new JPanel();
-        side.setPreferredSize(new Dimension(220, 0));
-        side.setBackground(new Color(28, 36, 58));
-        side.setLayout(new BoxLayout(side, BoxLayout.Y_AXIS));
-        side.setBorder(new EmptyBorder(30, 20, 30, 20));
 
-        JLabel logo = new JLabel("UniConvert");
-        logo.setForeground(Color.WHITE);
-        logo.setFont(new Font("Segoe UI", Font.BOLD, 22));
-        logo.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        side.add(logo);
-        side.add(Box.createVerticalStrut(40));
-
-        side.add(menuButton("Dashboard"));
-        side.add(menuButton("Convert"));
-        side.add(menuButton("Pricing"));
-        side.add(menuButton("History"));
-        side.add(menuButton("Account"));
-
-        JButton exitBtn = new JButton("Exit");
-        exitBtn.addActionListener(e -> exitApp());
-        exitBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
-
-        side.add(Box.createVerticalGlue());
-        side.add(exitBtn);
-
-        return side;
-    }
 
     private JButton menuButton(String text) {
         JButton btn = new JButton(text);
@@ -167,7 +138,7 @@ public class CampusFrontendUI extends JFrame {
 
         JButton browse = new JButton("Browse File");
         browse.setAlignmentX(Component.LEFT_ALIGNMENT);
-        browse.addActionListener(e -> fileField.setText("/home/user/sample.docx"));
+        browse.addActionListener(e -> fileField.setText("/home/sample.docx"));
 
         card.add(t);
         card.add(Box.createVerticalStrut(8));
@@ -193,7 +164,7 @@ public class CampusFrontendUI extends JFrame {
         hint.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 
         JComboBox<String> formats = new JComboBox<>(
-                new String[]{"PDF", "DOCX", "TXT", "HTML", "PNG", "JPG"}
+                new String[]{"PDF", "DOCX", "TXT", "HTML", "PNG", "JPG","xlsx"}
         );
 
         JButton convert = new JButton("Convert Now");
@@ -219,7 +190,7 @@ public class CampusFrontendUI extends JFrame {
         statusLabel = new JLabel("Ready");
         statusLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 
-        JLabel brand = new JLabel("UniConvert © Campus Tools");
+        JLabel brand = new JLabel("UniConvert © Modex Technologies");
         brand.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 
         foot.add(statusLabel, BorderLayout.WEST);
