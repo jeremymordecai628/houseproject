@@ -1,13 +1,16 @@
+package com.modex.exporter;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.io.File;
+import javax.swing.JFileChooser;
 
-public class CampusFrontendUI extends JFrame {
+public class Main extends JFrame {
 
     private JTextField fileField;
     private JLabel statusLabel;
 
-    public CampusFrontendUI() {
+    public Main() {
         setTitle("UniConvert – Campus Edition");
         setSize(1000, 620);
         setLocationRelativeTo(null);
@@ -138,7 +141,16 @@ public class CampusFrontendUI extends JFrame {
 
         JButton browse = new JButton("Browse File");
         browse.setAlignmentX(Component.LEFT_ALIGNMENT);
-        browse.addActionListener(e -> fileField.setText("/home/sample.docx"));
+        browse.addActionListener(e -> {
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setDialogTitle("Select a file to convert");
+		int result = fileChooser.showOpenDialog(null); // null = center on screen
+		if (result == JFileChooser.APPROVE_OPTION) {
+			// User selected a file
+             		File selectedFile = fileChooser.getSelectedFile();
+			fileField.setText(selectedFile.getAbsolutePath());
+		}
+	});
 
         card.add(t);
         card.add(Box.createVerticalStrut(8));
@@ -204,7 +216,7 @@ public class CampusFrontendUI extends JFrame {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception ignored) {}
 
-        SwingUtilities.invokeLater(() -> new CampusFrontendUI().setVisible(true));
+        SwingUtilities.invokeLater(() -> new Main().setVisible(true));
     }
 }
 
