@@ -9,6 +9,9 @@ public class Main extends JFrame {
 
     private JTextField fileField;
     private JLabel statusLabel;
+    private JPanel contentPanel;
+    private CardLayout cardLayout;
+
 
     public Main() {
         setTitle("UniConvert – Campus Edition");
@@ -16,6 +19,9 @@ public class Main extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         setLayout(new BorderLayout());
+	 // ✅ Add components
+        add(createSideMenu(), BorderLayout.WEST);
+        add(createMainPanel(), BorderLayout.CENTER);
 
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent e) {
@@ -73,15 +79,23 @@ public class Main extends JFrame {
     }
 
     private JPanel createMainPanel() {
-        JPanel main = new JPanel(new BorderLayout());
-        main.setBackground(Color.WHITE);
-        main.setBorder(new EmptyBorder(25, 30, 25, 30));
+	    JPanel wrapper = new JPanel(new BorderLayout());
+            wrapper.setBackground(Color.WHITE);
+            wrapper.setBorder(new EmptyBorder(25, 30, 25, 30));
 
-        main.add(createHeader(), BorderLayout.NORTH);
-        main.add(createCardArea(), BorderLayout.CENTER);
-        main.add(createFooter(), BorderLayout.SOUTH);
+            wrapper.add(createHeader(), BorderLayout.NORTH);
 
-        return main;
+            cardLayout = new CardLayout();
+            contentPanel = new JPanel(cardLayout);
+
+            contentPanel.add(createHomePage(), "HOME");
+            contentPanel.add(createHumanizerPage(), "HUMANIZER");
+            contentPanel.add(createFormattingPage(), "FORMAT");
+            contentPanel.add(createHelpPage(), "HELP");
+
+            wrapper.add(contentPanel, BorderLayout.CENTER);
+            wrapper.add(createFooter(), BorderLayout.SOUTH);
+	    return wrapper;
     }
 
     private JPanel createHeader() {
@@ -122,6 +136,81 @@ public class Main extends JFrame {
 
         return area;
     }
+
+
+    private JPanel createHomePage() {
+	    JPanel page = new JPanel(new GridLayout(1, 2, 25, 0));
+            page.setOpaque(false);
+	    page.add(uploadCard());
+            page.add(formatCard());
+	    return page;
+    }
+
+
+    private JPanel createHumanizerPage() {
+	    JPanel p = new JPanel(new BorderLayout());
+    	    JLabel l = new JLabel("Humanizer Tools Coming Soon");
+    	    l.setFont(new Font("Segoe UI", Font.BOLD, 20));
+            p.add(l, BorderLayout.CENTER);
+	    return p;
+    }
+
+    private JPanel createFormattingPage() {
+	    JPanel p = new JPanel(new BorderLayout());
+            JLabel l = new JLabel("Formatting Workspace");
+            l.setFont(new Font("Segoe UI", Font.BOLD, 20));
+            p.add(l, BorderLayout.CENTER);
+	    return p;
+    }
+
+    private JPanel createHelpPage() {
+	    JPanel p = new JPanel(new BorderLayout());
+            JLabel l = new JLabel("Help Center");
+            l.setFont(new Font("Segoe UI", Font.BOLD, 20));
+            p.add(l, BorderLayout.CENTER);
+            return p;
+    }
+
+
+    private JPanel createSideMenu() {
+	    JPanel side = new JPanel();
+            side.setPreferredSize(new Dimension(210, 0));
+            side.setBackground(new Color(32, 45, 64));
+            side.setLayout(new BoxLayout(side, BoxLayout.Y_AXIS));
+            side.setBorder(new EmptyBorder(25, 15, 25, 15));
+
+            JLabel logo = new JLabel("UniConvert");
+            logo.setForeground(Color.WHITE);
+            logo.setFont(new Font("Segoe UI", Font.BOLD, 18));
+            logo.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            JButton home = menuButton("Home");
+            JButton humanizer = menuButton("Humanizer");
+            JButton format = menuButton("Formatting");
+            JButton help = menuButton("Help");
+
+            styleSideButton(home);
+            styleSideButton(humanizer);
+            styleSideButton(format);
+            styleSideButton(help);
+
+            home.addActionListener(e -> cardLayout.show(contentPanel, "HOME"));
+            humanizer.addActionListener(e -> cardLayout.show(contentPanel, "HUMANIZER"));
+            format.addActionListener(e -> cardLayout.show(contentPanel, "FORMAT"));
+            help.addActionListener(e -> cardLayout.show(contentPanel, "HELP"));
+
+            side.add(logo);
+            side.add(Box.createVerticalStrut(35));
+            side.add(home);
+            side.add(Box.createVerticalStrut(12));
+            side.add(humanizer);
+            side.add(Box.createVerticalStrut(12));
+            side.add(format);
+            side.add(Box.createVerticalStrut(12));
+            side.add(help);
+	    return side;
+    }
+
 
     private JPanel uploadCard() {
         JPanel card = new JPanel();
@@ -219,4 +308,3 @@ public class Main extends JFrame {
         SwingUtilities.invokeLater(() -> new Main().setVisible(true));
     }
 }
-
