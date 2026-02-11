@@ -134,4 +134,141 @@
 * Clean UX
 * Scalable pages
 
+Short, honest answer first:
+
+> **❌ No system can convert *any* file to PDF / DOCX / XLSX.**
+>
+> **✅ Your exporter can convert *any file type that Office engines understand*.**
+
+Now let’s be precise and realistic.
+
+---
+
+# ✅ What our system *can* convert
+
+Using **LibreOffice + Microsoft Office**, you can convert files that are:
+
+✔ Text documents
+✔ Spreadsheets
+✔ Presentations
+✔ Markup files
+✔ Images (limited)
+✔ PDFs (partially)
+
+Examples that work well:
+
+| Input      | PDF | DOCX     | XLSX |
+| ---------- | --- | -------- | ---- |
+| DOC / DOCX | ✅   | ✅      | ❌   |
+| XLS / XLSX | ✅   | ❌      | ✅   |
+| PPT / PPTX | ✅   | ⚠️       | ❌   |
+| CSV        | ✅   | ❌      | ✅   |
+| HTML       | ✅   | ✅      | ⚠️    |
+| TXT        | ✅   | ✅      | ⚠️    |
+| PDF        | ✅   | ⚠️       | ⚠️    |
+| PNG / JPG  | ✅   | ⚠️ (OCR) | ❌   |
+
+---
+
+# ❌ What cannot be converted
+
+These are **not documents**:
+
+❌ EXE
+❌ MP3
+❌ MP4
+❌ ZIP
+❌ BIN
+❌ ISO
+❌ APK
+❌ Database files
+
+You can’t turn them into Word or Excel meaningfully.
+
+---
+
+# ✅ What “convert” really means
+
+Different targets imply different behavior:
+
+### → PDF
+
+Render visually → easy.
+
+### → DOCX
+
+Needs flowing text → some layout lost.
+
+### → XLSX
+
+Needs tables → only tabular data makes sense.
+
+So:
+
+* Image → DOCX requires OCR
+* PDF → XLSX requires table detection
+* PPT → XLSX usually meaningless
+
+---
+
+# ✅ What our  guarantees
+
+It guarantees:
+
+✔ Uses best available engine
+✔ Preserves layout where possible
+✔ Converts supported formats
+✔ Fails gracefully on nonsense input
+
+But **not magic**.
+
+---
+
+# ✅ How to make your app professional
+
+Before converting, detect file type:
+
+```java
+String name = file.getName().toLowerCase();
+if (!(name.endsWith(".docx") || name.endsWith(".xlsx") || name.endsWith(".pptx"))) {
+   // warn user
+}
+```
+
+Or smarter: use Apache Tika.
+
+---
+
+# ✅ Add OCR for images
+
+To truly support scans:
+
+```
+Image → OCR → DOCX / XLSX
+```
+
+Without OCR, images are just embedded.
+
+---
+
+
+---
+
+# 🎯 Final Answer
+
+> Our system can convert **any file type that LibreOffice or Microsoft Office understands** into PDF, DOCX, or XLSX.
+
+>
+> It cannot convert executables, media, archives, or binary formats meaningfully. For images and scans, you must add OCR to make them editable.
+
+---
+
+If you want, next I can give you:
+
+✅ File-type detection class
+✅ Validation layer
+✅ OCR auto-fallback
+✅ Error UX design
+
+So users don’t try to convert MP3 → Excel 😄.
 ---
