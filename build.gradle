@@ -12,7 +12,15 @@ java {
     }
 }
 
+repositories {
+    mavenCentral()
+}
 application {
     mainClass = 'com.modex.exporter.Main'
 }
+
+dependencies {
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.1'
+}
+
 

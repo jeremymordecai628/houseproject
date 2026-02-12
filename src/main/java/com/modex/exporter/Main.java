@@ -12,6 +12,13 @@ public class Main extends JFrame {
     private JPanel contentPanel;
     private CardLayout cardLayout;
 
+    private static void styleSideButton(javax.swing.JButton button) {
+	    button.setFocusPainted(false);
+	    button.setBorderPainted(false);
+	    button.setContentAreaFilled(false);
+    }
+
+
 
     public Main() {
         setTitle("UniConvert – Campus Edition");
