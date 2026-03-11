@@ -3,7 +3,10 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
+import java.io.FileInputStream;
 import javax.swing.JFileChooser;
+import com.modex.exporter.DocumentPreviewer;
 
 public class Main extends JFrame {
 
@@ -11,6 +14,7 @@ public class Main extends JFrame {
     private JLabel statusLabel;
     private JPanel contentPanel;
     private CardLayout cardLayout;
+    private JPanel originalPreviewPanel;
 
     private static void styleSideButton(javax.swing.JButton button) {
 	    button.setFocusPainted(false);
@@ -21,7 +25,7 @@ public class Main extends JFrame {
 
 
     public Main() {
-        setTitle("UniConvert – Campus Edition");
+        setTitle("UniApp – Campus Edition");
         setSize(1000, 620);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -52,7 +56,7 @@ public class Main extends JFrame {
         JMenuItem about = new JMenuItem("About");
         about.addActionListener(e ->
                 JOptionPane.showMessageDialog(this,
-                        "UniConvert Campus Edition\nFrontend Demo\nDesigned for Students",
+                        "UniApp Campus Edition\nFrontend Demo\nDesigned for Students",
                         "About", JOptionPane.INFORMATION_MESSAGE));
 
         file.add(exit);
@@ -235,6 +239,8 @@ public class Main extends JFrame {
         fileField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
         fileField.setEditable(false);
 
+	originalPreviewPanel = new JPanel();
+
         JButton browse = new JButton("Browse File");
         browse.setAlignmentX(Component.LEFT_ALIGNMENT);
         browse.addActionListener(e -> {
@@ -245,6 +251,9 @@ public class Main extends JFrame {
 			// User selected a file
              		File selectedFile = fileChooser.getSelectedFile();
 			fileField.setText(selectedFile.getAbsolutePath());
+			
+			// Preview original file dynamically
+			previewOriginal(selectedFile, originalPreviewPanel);
 		}
 	});
 
@@ -260,37 +269,97 @@ public class Main extends JFrame {
     }
 
     private JPanel formatCard() {
-        JPanel card = new JPanel();
-        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-        card.setBackground(new Color(245, 247, 250));
-        card.setBorder(new EmptyBorder(30, 30, 30, 30));
+	    // Main card panel
+            JPanel card = new JPanel();
+	    card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+	    card.setBackground(new Color(245, 247, 250));
+	    card.setBorder(new EmptyBorder(30, 30, 30, 30));
 
-        JLabel t = new JLabel("Choose Format");
-        t.setFont(new Font("Segoe UI", Font.BOLD, 18));
+	    // Title label
+	    JLabel t = new JLabel("Choose Format");
+	    t.setFont(new Font("Segoe UI", Font.BOLD, 18));
 
-        JLabel hint = new JLabel("Select output format");
-        hint.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+	    // Hint label
+	    JLabel hint = new JLabel("Select output format");
+	    hint.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 
-        JComboBox<String> formats = new JComboBox<>(
-                new String[]{"PDF", "DOCX", "TXT", "HTML", "PNG", "JPG","xlsx"}
-        );
+	    // Original preview panel
+	    JPanel originalPreviewPanel = new JPanel();
+	    originalPreviewPanel.setLayout(new BorderLayout());
+	    originalPreviewPanel.setPreferredSize(new Dimension(400, 200));
+	    originalPreviewPanel.setBackground(Color.WHITE);
+	    originalPreviewPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 
-        JButton convert = new JButton("Convert Now");
-        convert.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        convert.addActionListener(e ->
-                statusLabel.setText("Frontend demo: conversion action triggered"));
+	    // Combo box for format selection
+	    JComboBox<String> formats = new JComboBox<>(
+			    new String[]{"PDF", "DOCX", "TXT", "HTML", "PNG", "JPG", "XLSX"}
+			    );
+	    formats.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
+	    formats.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 
-        card.add(t);
-        card.add(Box.createVerticalStrut(8));
-        card.add(hint);
-        card.add(Box.createVerticalStrut(20));
-        card.add(formats);
-        card.add(Box.createVerticalStrut(20));
-        card.add(convert);
+	    // Convert button
+	    JButton convert = new JButton("Convert Now");
+	    convert.setFont(new Font("Segoe UI", Font.BOLD, 14));
+	    convert.addActionListener(e -> statusLabel.setText("Frontend demo: conversion action triggered"));
 
-        return card;
+	    // Browse button to select file
+	    JButton browse = new JButton("Browse File");
+	    browse.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+	    browse.addActionListener(e -> {
+		    JFileChooser fileChooser = new JFileChooser();
+		    if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+			    File selectedFile = fileChooser.getSelectedFile();
+			    fileField.setText(selectedFile.getAbsolutePath());
+
+			    // Preview original file dynamically
+			    previewOriginal(selectedFile, originalPreviewPanel);
+		    }
+	    });
+
+	    // File field
+	    fileField = new JTextField();
+	    fileField.setEditable(false);
+	    fileField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
+	    // Add components with spacing
+	    card.add(t);
+	    card.add(Box.createVerticalStrut(8));
+	    card.add(hint);
+	    card.add(Box.createVerticalStrut(20));
+	    card.add(originalPreviewPanel);  // Original preview panel
+	    card.add(Box.createVerticalStrut(20));
+	    card.add(fileField);
+	    card.add(Box.createVerticalStrut(8));
+	    card.add(browse);
+	    card.add(Box.createVerticalStrut(20));
+	    card.add(formats);
+	    card.add(Box.createVerticalStrut(20));
+	    card.add(convert);
+	    return card;
     }
 
+    // ================= Original Preview Logic Integrated =================
+    private void previewOriginal(File file, JPanel previewPanel) {
+	    previewPanel.removeAll();
+	    
+	    try {
+		    String name = file.getName().toLowerCase();
+
+		    if (name.endsWith(".pdf")) {
+			    DocumentPreviewer.renderPDF(new FileInputStream(file), previewPanel);
+		    
+		    } else if (name.endsWith(".docx")) {
+			    DocumentPreviewer.renderDOCX(new FileInputStream(file), previewPanel);
+		    } else if (name.endsWith(".xlsx")) {
+			    DocumentPreviewer.renderXLSX(new FileInputStream(file), previewPanel);
+		    } else {
+			    previewPanel.add(new JLabel("Preview not supported"));
+		    }
+	    } catch (Exception ex) {
+		    previewPanel.add(new JLabel("Error previewing file"));
+	    }
+	    previewPanel.revalidate();
+	    previewPanel.repaint();
+    }
     private JPanel createFooter() {
         JPanel foot = new JPanel(new BorderLayout());
         foot.setOpaque(false);

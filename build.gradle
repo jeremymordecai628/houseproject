@@ -20,7 +20,37 @@ application {
 }
 
 dependencies {
+
+    // Jackson Databind:
+    // Provides powerful JSON serialization and deserialization.
+    // Converts Java objects <-> JSON automatically using ObjectMapper.
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.1'
+
+    // org.json:
+    // Lightweight JSON library providing JSONObject and JSONArray classes.
+    // Useful for manual JSON object construction and parsing.
+    implementation 'org.json:json:20231013'
+
+    // Used for preview  PDFs 
+    implementation 'org.apache.pdfbox:pdfbox:2.0.30'
+
+    // Apache POI Core:
+    // Base library for Microsoft Office file handling.
+    // Provides shared interfaces like Workbook, Sheet, Row, Cell.
+    // Required by both XLS and XLSX processing.
+    implementation 'org.apache.poi:poi:5.2.3'
+
+    // Apache POI OOXML:
+    // Adds support for modern Office formats:
+    // .xlsx (Excel), .docx (Word), .pptx (PowerPoint).
+    // Provides XSSFWorkbook, XWPFDocument, XSSF*, XWPF* classes.
+    implementation 'org.apache.poi:poi-ooxml:5.2.3'
+
+    // OOXML Schemas:
+    // Provides full XML schema definitions required by some advanced
+    // Word (.docx) and Excel (.xlsx) features.
+    // Necessary for certain XWPF and complex document operations.
+    implementation 'org.apache.poi:ooxml-schemas:1.4'
 }
 
 
