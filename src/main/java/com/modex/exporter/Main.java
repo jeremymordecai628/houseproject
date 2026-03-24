@@ -1,6 +1,8 @@
 package com.modex.exporter;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.DocumentEvent;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
@@ -138,34 +140,23 @@ public class Main extends JFrame {
     }
 
     private JPanel createCardArea() {
-        JPanel area = new JPanel();
-        area.setOpaque(false);
-        area.setLayout(new GridLayout(1, 2, 25, 0));
-
-        area.add(uploadCard());
-        area.add(formatCard());
-
-        return area;
+        JPanel page = new JPanel();
+        page.setOpaque(false);
+        page.setLayout(new GridLayout(1, 2, 25, 0));
+        return page;
     }
 
 
     private JPanel createHomePage() {
-	    JPanel page = new JPanel(new GridLayout(1, 2, 25, 0));
-            page.setOpaque(false);
-	    page.add(uploadCard());
-            page.add(formatCard());
+	    JPanel page = createCardArea();
+            page.add(ConvertCard());
 	    return page;
     }
-
-
     private JPanel createHumanizerPage() {
-	    JPanel p = new JPanel(new BorderLayout());
-    	    JLabel l = new JLabel("Humanizer Tools Coming Soon");
-    	    l.setFont(new Font("Segoe UI", Font.BOLD, 20));
-            p.add(l, BorderLayout.CENTER);
-	    return p;
+	    JPanel page = createCardArea();
+            page.add(AICard());
+	    return page;
     }
-
     private JPanel createFormattingPage() {
 	    JPanel p = new JPanel(new BorderLayout());
             JLabel l = new JLabel("Formatting Workspace");
@@ -173,13 +164,18 @@ public class Main extends JFrame {
             p.add(l, BorderLayout.CENTER);
 	    return p;
     }
-
     private JPanel createHelpPage() {
-	    JPanel p = new JPanel(new BorderLayout());
-            JLabel l = new JLabel("Help Center");
-            l.setFont(new Font("Segoe UI", Font.BOLD, 20));
-            p.add(l, BorderLayout.CENTER);
-            return p;
+	    JPanel page =createCardArea();
+	    page.add(FAQCard());
+            return page;
+    }
+
+    private JPanel createBaseCard() {
+	    JPanel card = new JPanel();
+	    card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+	    card.setBackground(new Color(245, 247, 250));
+	    card.setBorder(new EmptyBorder(30, 30, 30, 30));
+	    return card;
     }
 
 
@@ -200,10 +196,10 @@ public class Main extends JFrame {
             JButton format = menuButton("Formatting");
             JButton help = menuButton("Help");
 
-            styleSideButton(home);
-            styleSideButton(humanizer);
-            styleSideButton(format);
-            styleSideButton(help);
+	    home.setForeground(Color.WHITE);
+	    humanizer.setForeground(Color.WHITE);
+	    format.setForeground(Color.WHITE);
+	    help.setForeground(Color.WHITE);
 
             home.addActionListener(e -> cardLayout.show(contentPanel, "HOME"));
             humanizer.addActionListener(e -> cardLayout.show(contentPanel, "HUMANIZER"));
@@ -223,57 +219,10 @@ public class Main extends JFrame {
     }
 
 
-    private JPanel uploadCard() {
-        JPanel card = new JPanel();
-        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-        card.setBackground(new Color(245, 247, 250));
-        card.setBorder(new EmptyBorder(30, 30, 30, 30));
-
-        JLabel t = new JLabel("Upload Document");
-        t.setFont(new Font("Segoe UI", Font.BOLD, 18));
-
-        JLabel hint = new JLabel("Choose a file from your device");
-        hint.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-
-        fileField = new JTextField();
-        fileField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
-        fileField.setEditable(false);
-
-	originalPreviewPanel = new JPanel();
-
-        JButton browse = new JButton("Browse File");
-        browse.setAlignmentX(Component.LEFT_ALIGNMENT);
-        browse.addActionListener(e -> {
-		JFileChooser fileChooser = new JFileChooser();
-		fileChooser.setDialogTitle("Select a file to convert");
-		int result = fileChooser.showOpenDialog(null); // null = center on screen
-		if (result == JFileChooser.APPROVE_OPTION) {
-			// User selected a file
-             		File selectedFile = fileChooser.getSelectedFile();
-			fileField.setText(selectedFile.getAbsolutePath());
-			
-			// Preview original file dynamically
-			previewOriginal(selectedFile, originalPreviewPanel);
-		}
-	});
-
-        card.add(t);
-        card.add(Box.createVerticalStrut(8));
-        card.add(hint);
-        card.add(Box.createVerticalStrut(20));
-        card.add(fileField);
-        card.add(Box.createVerticalStrut(15));
-        card.add(browse);
-
-        return card;
-    }
-
-    private JPanel formatCard() {
+    private JPanel ConvertCard() {
 	    // Main card panel
-            JPanel card = new JPanel();
-	    card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-	    card.setBackground(new Color(245, 247, 250));
-	    card.setBorder(new EmptyBorder(30, 30, 30, 30));
+	    JPanel ConvertCard = createBaseCard();
+	    ConvertCard.add(new JLabel("Converting Content"));
 
 	    // Title label
 	    JLabel t = new JLabel("Choose Format");
@@ -321,21 +270,112 @@ public class Main extends JFrame {
 	    fileField.setEditable(false);
 	    fileField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
 	    // Add components with spacing
-	    card.add(t);
-	    card.add(Box.createVerticalStrut(8));
-	    card.add(hint);
-	    card.add(Box.createVerticalStrut(20));
-	    card.add(originalPreviewPanel);  // Original preview panel
-	    card.add(Box.createVerticalStrut(20));
-	    card.add(fileField);
-	    card.add(Box.createVerticalStrut(8));
-	    card.add(browse);
-	    card.add(Box.createVerticalStrut(20));
-	    card.add(formats);
-	    card.add(Box.createVerticalStrut(20));
-	    card.add(convert);
+	    ConvertCard.add(t);
+	    ConvertCard.add(Box.createVerticalStrut(8));
+	    ConvertCard.add(hint);
+	    ConvertCard.add(Box.createVerticalStrut(20));
+	    ConvertCard.add(originalPreviewPanel);  // Original preview panel
+	    ConvertCard.add(Box.createVerticalStrut(20));
+	    ConvertCard.add(fileField);
+	    ConvertCard.add(Box.createVerticalStrut(8));
+	    ConvertCard.add(browse);
+	    ConvertCard.add(Box.createVerticalStrut(20));
+	    ConvertCard.add(formats);
+	    ConvertCard.add(Box.createVerticalStrut(20));
+	    ConvertCard.add(convert);
+	    return ConvertCard;
+    }
+    private JPanel AICard(){
+	    JPanel card = createBaseCard(); // reuse your base card   
+	    JLabel title = new JLabel("AI Humanizer");
+            title.setFont(new Font("Segoe UI", Font.BOLD, 16));
+            JTextArea textArea = new JTextArea(10, 40);
+            JScrollPane scroll = new JScrollPane(textArea);
+	    textArea.setLineWrap(true);
+	    textArea.setWrapStyleWord(true);
+	    JLabel counter = new JLabel("Words: 0 / 200");
+	    // Word limit logic
+	    textArea.getDocument().addDocumentListener(new DocumentListener() {
+		    private void update() {
+			    String text = textArea.getText().trim();
+			    String[] words = text.isEmpty() ? new String[0] : text.split("\\s+");
+
+			    if (words.length > 200) {
+				    StringBuilder limited = new StringBuilder();
+				    for (int i = 0; i < 200; i++) {
+					    limited.append(words[i]).append(" ");
+				    }
+				    textArea.setText(limited.toString().trim());
+			    }
+			    counter.setText("Words: " + Math.min(words.length, 200) + " / 200");
+		    }
+		    public void insertUpdate(DocumentEvent e) { update(); }
+		    public void removeUpdate(DocumentEvent e) { update(); }
+		    public void changedUpdate(DocumentEvent e) { update(); }
+	    });
+	    JButton submit = new JButton("Process Text");
+
+	    // Layout
+	    card.add(title);
+	    card.add(Box.createVerticalStrut(15));
+	    card.add(scroll);
+	    card.add(Box.createVerticalStrut(10));
+	    card.add(counter);
+	    card.add(Box.createVerticalStrut(15));
+	    card.add(submit);
 	    return card;
     }
+
+    private JPanel createFAQItem(String question, String answer) {
+	    JPanel panel = new JPanel();
+	    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+	    panel.setBackground(Color.WHITE);
+	    panel.setBorder(BorderFactory.createLineBorder(new Color(220, 220, 220)));
+	    JButton qButton = new JButton(question);
+	    qButton.setFocusPainted(false);
+	    qButton.setContentAreaFilled(false);
+	    qButton.setBorderPainted(false);
+	    qButton.setHorizontalAlignment(SwingConstants.LEFT);
+	    qButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+	    JTextArea aText = new JTextArea(answer);
+	    aText.setLineWrap(true);
+	    aText.setWrapStyleWord(true);
+	    aText.setEditable(false);
+	    aText.setVisible(false);
+	    aText.setBackground(Color.WHITE);
+
+	    // Toggle visibility
+	    qButton.addActionListener(e -> {
+		    aText.setVisible(!aText.isVisible());
+		    panel.revalidate();
+	    });
+	    panel.add(qButton);
+	    panel.add(aText);
+	    return panel;
+    }
+
+    private JPanel FAQCard() {
+	    JPanel card = createBaseCard();
+	    JLabel title = new JLabel("Frequently Asked Questions");
+	    title.setFont(new Font("Segoe UI", Font.BOLD, 18));
+
+	    card.add(title);
+	    card.add(Box.createVerticalStrut(20));
+
+	    // Add FAQs
+	    card.add(createFAQItem("What is UniConvert?",
+				    "UniConvert is a tool that helps format and humanize text using AI."));
+	    card.add(Box.createVerticalStrut(10));
+	    card.add(createFAQItem("What is the word limit?",
+				    "You can input up to 200 words in the AI Humanizer."));
+	    card.add(Box.createVerticalStrut(10));
+	    card.add(createFAQItem("Is my data محفوظ?",
+				    "Your data is processed securely and not stored permanently."));
+	    return card;
+    }
+
+
+
 
     // ================= Original Preview Logic Integrated =================
     private void previewOriginal(File file, JPanel previewPanel) {
