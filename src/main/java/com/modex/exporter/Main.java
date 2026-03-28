@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.FileInputStream;
 import javax.swing.JFileChooser;
 import com.modex.exporter.DocumentPreviewer;
+import com.modex.exporter.Payment;
+
 
 public class Main extends JFrame {
 
@@ -17,6 +19,7 @@ public class Main extends JFrame {
     private JPanel contentPanel;
     private CardLayout cardLayout;
     private JPanel originalPreviewPanel;
+    private String phoneno;
 
     private static void styleSideButton(javax.swing.JButton button) {
 	    button.setFocusPainted(false);
@@ -139,6 +142,12 @@ public class Main extends JFrame {
         return header;
     }
 
+    private  void  pay(String AccountRefence){
+	    phoneno  = JOptionPane.showInputDialog(null,
+			    "Enter your phoneNumber to simulate card entry:",
+			    "phoneNo Entry",
+			    JOptionPane.PLAIN_MESSAGE);
+    }
     private JPanel createCardArea() {
         JPanel page = new JPanel();
         page.setOpaque(false);
@@ -249,8 +258,7 @@ public class Main extends JFrame {
 	    // Convert button
 	    JButton convert = new JButton("Convert Now");
 	    convert.setFont(new Font("Segoe UI", Font.BOLD, 14));
-	    convert.addActionListener(e -> statusLabel.setText("Frontend demo: conversion action triggered"));
-
+	    convert.addActionListener(e -> pay("ABC123"));
 	    // Browse button to select file
 	    JButton browse = new JButton("Browse File");
 	    browse.setFont(new Font("Segoe UI", Font.PLAIN, 13));
@@ -382,7 +390,7 @@ public class Main extends JFrame {
 	    previewPanel.removeAll();
 	    
 	    try {
-		    String name = file.getName().toLowerCase();
+		    String name = file.getName().toLowerCase().trim();
 
 		    if (name.endsWith(".pdf")) {
 			    DocumentPreviewer.renderPDF(new FileInputStream(file), previewPanel);
@@ -395,6 +403,8 @@ public class Main extends JFrame {
 			    previewPanel.add(new JLabel("Preview not supported"));
 		    }
 	    } catch (Exception ex) {
+		    ex.printStackTrace(); // <-- shows full error in console
+		    previewPanel.removeAll();
 		    previewPanel.add(new JLabel("Error previewing file"));
 	    }
 	    previewPanel.revalidate();
