@@ -3,7 +3,7 @@ plugins {
     id 'application'
 }
 
-group = 'com.example'
+group = 'com.modex'
 version = '1.0'
 
 java {
@@ -20,11 +20,12 @@ application {
 }
 
 dependencies {
-
-	  // WebSocket API (interfaces like Session, ClientEndpoint)
-	  implementation 'jakarta.websocket:jakarta.websocket-api:2.1.1'
-	  // WebSocket client implementation (GlassFish Tyrus)
-	  implementation 'org.glassfish.tyrus.bundles:tyrus-standalone-client:2.1.2'
+	//Sqlite  configurations
+	implementation 'org.xerial:sqlite-jdbc:3.45.1.0'
+	// WebSocket API (interfaces like Session, ClientEndpoint)
+	implementation 'jakarta.websocket:jakarta.websocket-api:2.1.1'
+	// WebSocket client implementation (GlassFish Tyrus)
+	implementation 'org.glassfish.tyrus.bundles:tyrus-standalone-client:2.1.2'
 	// Converts Java objects <-> JSON automatically using ObjectMapper.
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.1'
 	// Useful for manual JSON object construction and parsing.
