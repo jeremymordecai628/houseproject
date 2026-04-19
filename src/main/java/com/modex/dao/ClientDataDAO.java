@@ -28,7 +28,7 @@ public class ClientDataDAO {
 
     // Insert
     public void insert(ClientData client) {
-        String sql = "INSERT INTO client_data(id, name) VALUES(?, ?)";
+        String sql = "INSERT INTO client_data(id, name, downloadid) VALUES(?, ?, ?)";
 
         try (Connection conn = DBConnection.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {

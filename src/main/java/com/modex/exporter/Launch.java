@@ -7,6 +7,8 @@ import com.modex.dao.MetaDAO;
 import com.modex.dao.TransactionDAO;
 import com.modex.dao.ServicesDAO;
 import com.modex.dao.ClientDataDAO;
+import com.modex.model.services;
+import com.modex.model.ClientData;  
 import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
@@ -37,15 +39,14 @@ public class Launch {
 	    trans.createTable();
 	    service.createTable();
 
-
-            // Seed initial data
-            studentDAO.insert(new Student("Admin"));
+	    // insert initial data
+	    initializedata();
 
             // Mark as initialized
             metaDAO.setInitialized();
         }
     }
-    public void initializedata() {
+    public static  void initializedata() {
 	    try {
 		    String username = JOptionPane.showInputDialog(null,
 				    "Enter your username login in our website", "Username Entry",
@@ -75,19 +76,27 @@ public class Launch {
 			    }
 			    reader.close();
 			    JSONObject json = new JSONObject(response.toString());
-			    ClientDataDAO client = new ClientDataDAO (
+			    //Create Dao and  Model object
+			    ClientDataDAO clientDAO = new ClientDataDAO();
+			    ServicesDAO serviceDAO = new ServicesDAO();
+			    ClientData client = new ClientData (
 					    json.getString("id"),
-					    json.getString("name")
+					    json.getString("name"),
+					    json.getString("downloadId")
 					    );
-			    ServicesDAO service =new ServicesDAO(
-					    json.getString("account_no");
-					    json.getString("service_name");
+			    services service =new services(
+					    json.getString("account_no"),
+					    json.getString("service_name")
 					    );
 			    // Example: store it
-			    new ClientDataDAO().insert(client);
-			    new ServicesDAO().insert(service);
+			    clientDAO.insert(client);
+			    serviceDAO.insert(service);
 		    } else {
 			    System.out.println("Error: " + responseCode);
 		    }
-	    }}
+	    } catch (Exception e) {
+		    e.printStackTrace();
+	    }
+    }
 }
+

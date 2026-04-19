@@ -13,24 +13,19 @@ import com.modex.exporter.Payment;
 import com.modex.exporter.Launch;
 import com.modex.dao.ClientDataDAO;
 import com.modex.dao.ServicesDAO;
-
+import com.modex.model.services;  
 
 public class Main extends JFrame {
 
+    //Create the object
+    ServicesDAO serviceDAO = new ServicesDAO();
+    ClientDataDAO client  = new ClientDataDAO();
+    //Establish  Attributes
     private JTextField fileField;
     private JLabel statusLabel;
     private JPanel contentPanel;
     private CardLayout cardLayout;
-    private JPanel originalPreviewPanel;
-    private String phoneno;
-
-    private static void styleSideButton(javax.swing.JButton button) {
-	    button.setFocusPainted(false);
-	    button.setBorderPainted(false);
-	    button.setContentAreaFilled(false);
-    }
-
-
+    
 
     public Main() {
         setTitle("UniApp – Campus Edition");
@@ -146,7 +141,7 @@ public class Main extends JFrame {
     }
 
     private  void  pay(String AccountRefence){
-	    phoneno  = JOptionPane.showInputDialog(null,
+	    String phoneno  = JOptionPane.showInputDialog(null,
 			    "Enter your phoneNumber to simulate card entry:",
 			    "phoneNo Entry",
 			    JOptionPane.PLAIN_MESSAGE);
@@ -236,6 +231,8 @@ public class Main extends JFrame {
 	    JPanel ConvertCard = createBaseCard();
 	    ConvertCard.add(new JLabel("Converting Content"));
 
+	    // Variables
+	    services service = serviceDAO.getByAccount("Convert");
 	    // Title label
 	    JLabel t = new JLabel("Choose Format");
 	    t.setFont(new Font("Segoe UI", Font.BOLD, 18));
@@ -261,7 +258,7 @@ public class Main extends JFrame {
 	    // Convert button
 	    JButton convert = new JButton("Convert Now");
 	    convert.setFont(new Font("Segoe UI", Font.BOLD, 14));
-	    convert.addActionListener(e -> pay("ABC123"));
+	    convert.addActionListener(e -> pay(service.Account()));
 	    // Browse button to select file
 	    JButton browse = new JButton("Browse File");
 	    browse.setFont(new Font("Segoe UI", Font.PLAIN, 13));
@@ -297,6 +294,7 @@ public class Main extends JFrame {
 	    return ConvertCard;
     }
     private JPanel AICard(){
+	    services service = serviceDAO.getByAccount("Humanizer");
 	    JPanel card = createBaseCard(); // reuse your base card   
 	    JLabel title = new JLabel("AI Humanizer");
             title.setFont(new Font("Segoe UI", Font.BOLD, 16));
@@ -325,6 +323,7 @@ public class Main extends JFrame {
 		    public void changedUpdate(DocumentEvent e) { update(); }
 	    });
 	    JButton submit = new JButton("Process Text");
+	    submit.addActionListener(e -> pay(service.Account()));
 
 	    // Layout
 	    card.add(title);
