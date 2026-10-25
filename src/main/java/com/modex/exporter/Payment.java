@@ -20,82 +20,75 @@ import org.json.JSONObject;
 import com.modex.dao.TransactionDAO;
 
 public  class  Payment{
-	private String serverUrl;
-	private String phoneNumber; 
+	private String serverUrl; 
 	private String accountReference;
 	private String clientId;
-	private String WS_SERVER;
 	private Session session;
 	public Payment(String serverUrl, String phoneNumber, String accountReference, String clientId, String WS_SERVER){ 
-		this.serverUrl = serverUrl;
-		this.phoneNumber = phoneNumber; 
+		this.serverUrl = serverUrl; 
 		this.accountReference = accountReference; 
 		this.clientId = clientId;
-		this.WS_SERVER = WS_SERVER;
+        this.session= session;
 	}
-	// Connect WebSocket
-	public void connect() {
-		try {
-			WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-			session = container.connectToServer(
-					this,
-					URI.create(WS_SERVER + clientId)
-					);
-			System.out.println("WebSocket connected");
-		} catch (Exception e) {
-			System.out.println("WebSocket error: " + e.getMessage());
-		}
-	}
-	public void initiatePayment() {
-		try {
-			URL url = new URL(serverUrl + "/initiate-payment");
-			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-			conn.setRequestMethod("POST");
-			conn.setRequestProperty("Content-Type", "application/json");
-			conn.setDoOutput(true);
-			Map<String, String> payload = new HashMap<>();
-			payload.put("phone", phoneNumber);
-			payload.put("clientId", clientId);
-			payload.put("accountReference", accountReference);
-			JSONObject jsonPayload = new JSONObject(payload);
-			conn.getOutputStream().write(jsonPayload.toString().getBytes());
-			int responseCode = conn.getResponseCode();
-			if (responseCode == 200) {
-				BufferedReader reader = new BufferedReader(
-						new InputStreamReader(conn.getInputStream()));
-				String response = reader.readLine();
-				System.out.println("Server response: " + response);
-			} else {
-				System.out.println("Error: " + responseCode);
-			}
-		} catch (Exception e) {
-			System.out.println("Error initiating payment: " + e.getMessage());
-		}
-	}
-	// =========================
-	//  WebSocket Callbacks
-	// =========================
-	
-	@OnOpen
-	public void onOpen(Session session) {
-		System.out.println("Connected to server (WS)");
-	}
-	@OnMessage
-	public void onMessage(String message) {
-		System.out.println("Payment update: " + message);
-		if (message.contains("SUCCESS")) {
-			System.out.println("✅ Payment Successful");
-		} else if (message.contains("FAILED")) {
-			System.out.println("❌ Payment Failed");
-		}
-	}
-	@OnClose
-	public void onClose(Session session, CloseReason reason) {
-		System.out.println("Disconnected: " + reason);
-	}
-	@OnError
-	public void onError(Session session, Throwable error) {
-		System.out.println("Error: " + error.getMessage());
-	}
+    public static String sendPaymentDetails(String serverUrl) {
+
+        try {
+            String phone = JOptionPane.showInputDialog(
+                null, "Enter phone number:"
+            );
+
+            if (phone == null || phone.trim().isEmpty()) {
+                return "Phone number is required.";
+            }
+
+
+            JSONObject data = new JSONObject();
+            data.put("phone", phone.trim());
+            data.put("account_reference", accountReference.trim());
+
+            HttpClient client = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(10))
+                .build();
+
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl))
+                .timeout(Duration.ofSeconds(30))
+                .header("Content-Type", "application/json")
+                .POST(BodyPublishers.ofString(
+                    data.toString(),
+                    StandardCharsets.UTF_8
+                ))
+                .build();
+
+            HttpResponse<String> response = client.send(
+                request, BodyHandlers.ofString()
+            );
+
+            if (response.statusCode() >= 200 &&
+                    response.statusCode() < 300) {
+                JOptionPane.showMessageDialog(
+                    null, "Server response:\n" + response.body()
+                );
+                return response.body();
+            }
+
+            return "Request failed. HTTP status: "
+                + response.statusCode()
+                + "\n" + response.body();
+
+        } catch (Exception e) {
+            return "Error sending details: " + e.getMessage();
+        }
+    }
+    
+    public static Transaction createTransaction(JSONObject json) {
+        String transId = json.getString("trans_id");
+        LocalDateTime paymentDate =
+                LocalDateTime.parse(json.getString("paymentdate"));
+        double amount = json.getDouble("amount");
+        String paidId = json.getString("paid_id");
+
+        return new Transaction(transId, paymentDate, amount, paidId);
+    }
 }
 

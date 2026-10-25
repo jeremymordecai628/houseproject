@@ -24,28 +24,44 @@ public class Launch {
     public static void init() {
         MetaDAO metaDAO = new MetaDAO();
         ClientDataDAO client  = new ClientDataDAO();
-	TransactionDAO trans = new TransactionDAO();
-	ServicesDAO  service = new ServicesDAO();
-
-
+        TransactionDAO trans = new TransactionDAO();
+        ServicesDAO  service = new ServicesDAO();
         // Always ensure meta table exists
         metaDAO.createMetaTable();
-
         // Run only once
         if (!metaDAO.isInitialized()) {
-
             // Create all required tables
             client.createTable();
-	    trans.createTable();
-	    service.createTable();
-
-	    // insert initial data
-	    initializedata();
-
+	        trans.createTable();
+	        service.createTable();
+	        // insert initial data
+	        initializedata();
             // Mark as initialized
             metaDAO.setInitialized();
         }
-    }
+        socketManager.on("transaction", args -> {
+            JSONObject data = (JSONObject) args[0];
+            Transaction transaction = Payment.createTransaction(data);
+            Payment.processTransaction(transaction);
+        });
+        
+        socketManager.on("token", args -> {
+            if (args.length > 0) {
+                Object data = args[0];
+                String token = null;
+                if (data instanceof JSONObject) {
+                    token = ((JSONObject) data).optString("token", null);
+                } else if (data instanceof String) {
+                    token = (String) data;
+                }
+
+                if (token != null && !token.isEmpty()) {
+                    Action.setTokens(token);
+                    System.out.println("Token received successfully.");
+                }
+            } 
+        });
+
     public static  void initializedata() {
 	    try {
 		    String username = JOptionPane.showInputDialog(null,
